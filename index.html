@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repository Search</title>
+    <script src="https://unpkg.com/htmx.org@1.8.6"></script>
+</head>
+<body>
+    <h1>GitHub Repository Search</h1>
+    <input type="text" name="search" placeholder="Search repositories"
+           hx-post="/search"
+           hx-trigger="keyup changed delay:500ms"
+           hx-target="#search-results"
+           hx-indicator=".htmx-indicator">
+    <div class="htmx-indicator">Searching...</div>
+    <div id="search-results"></div>
+
+    <script>
+        htmx.on("#search-results", "htmx:afterSwap", function(evt) {
+            const results = JSON.parse(evt.detail.xhr.response);
+            const resultsDiv = document.getElementById("search-results");
+            resultsDiv.innerHTML = "";
+            results.forEach(repo => {
+                const repoDiv = document.createElement("div");
+                repoDiv.innerHTML = `
+                    <h2>${repo.name}</h2>
+                    <p>${repo.description}</p>
+                    <p>Stars: ${repo.stars}</p>
+                    <p>Language: ${repo.language}</p>
+                    <a href="${repo.url}" target="_blank">View on GitHub</a>
+                `;
+                resultsDiv.appendChild(repoDiv);
+            });
+        });
+    </script>
+</body>
+</html>
